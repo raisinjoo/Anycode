@@ -1,0 +1,101 @@
+from tkinter import *
+import tkinter.messagebox as MessageBox
+import mysql.connector as mysql
+
+def insert():
+    name = ent_name.get()
+    phone = ent_phone.get()
+
+    if(name=="" or phone==""):
+        MessageBox.showinfo("Статус добавления","Ошибка: некоторые\все поля пустые")
+    else:
+        con = mysql.connect(host="localhost", user="root", password="13111998", database = "Phone_Book")
+        custor = con.cursor()
+        custor.execute("INSERT INTO Contacts VALUES('"+name+"','"+phone+"')")
+        custor.execute("commit")
+
+        MessageBox.showinfo("Статус дополнения","Успешно добавлено!")
+        con.close
+
+def delete():
+    name = ent_name.get()
+    phone = ent_phone.get()
+
+    if(name=="" or phone==""):
+        MessageBox.showinfo("Статус удаления","Ошибка: укажите все поля для удаления контакта")
+    else:
+        con = mysql.connect(host="localhost", user="root", password="13111998", database = "Phone_Book")
+        custor = con.cursor()
+        custor.execute("DELETE FROM Contacts WHERE Name='"+name+"' AND  Phone='"+phone+"'")
+        custor.execute("commit")
+
+        MessageBox.showinfo("Статус удаления","Успешно удалено!")
+        con.close()
+
+def find_by_name():
+    name = ent_name.get()
+    if(name==""):
+        MessageBox.showinfo("Статус поиска","Ошибка: укажите имя контакта")
+    else:
+        con = mysql.connect(host="localhost", user="root", password="13111998", database = "Phone_Book")
+        custor = con.cursor()
+        custor.execute("SELECT * FROM Contacts WHERE Name='"+name+"'")
+        custor.execute("commit")
+        con.close()
+
+def find_by_phone():
+    phone = ent_name.get()
+    if(phone==""):
+        MessageBox.showinfo("Статус поиска","Ошибка: укажите телефон контакта")
+    else:
+        con = mysql.connect(host="localhost", user="root", password="13111998", database = "Phone_Book")
+        custor = con.cursor()
+        custor.execute("SELECT * FROM Contacts WHERE Name='"+phone+"'")
+        custor.execute("commit")
+        con.close()
+
+def show():
+    con = mysql.connect(host="localhost", user="root", password="13111998", database = "Phone_Book")
+    custor = con.cursor()
+    custor.execute("SELECT * FROM Contacts")
+    rows = custor.fetchall();
+
+    for row in rows:
+        insertData = str(row[0])+'        '+row[1]
+        data.insert(data.size()+1, insertData)
+        
+    con.close()
+
+main=Tk()
+main.geometry("500x270")
+main.title("Телефонная книга")
+
+name = Label(main, text='Имя:', font=('bold',12))
+name.place(x=42,y=30)
+
+phone = Label(main, text='Телефон:', font=('bold',12))
+phone.place(x=10,y=60)
+
+ent_name = Entry()
+ent_name.place(x=85,y=33)
+
+ent_phone = Entry()
+ent_phone.place(x=85,y=63)
+
+insert = Button(main, text="Добавить", font=('italic',12), bg="pink", command = insert)
+insert.place(x=20,y=90)
+
+delete = Button(main, text="Удалить", font=('italic',12), bg="pink", command = delete)
+delete.place(x=130,y=90)
+
+fbn = Button(main, text="Найти по имени", font=('italic',12), bg="pink", command = find_by_name)
+fbn.place(x=20,y=120)
+
+fbp = Button(main, text="Найти по номеру", font=('italic',12), bg="pink", command = find_by_phone)
+fbp.place(x=20,y=160)
+
+update = delete = Button(main, text="Обновить", font=('italic',12), bg="pink", command = show)
+update.place(x=100,y=200)
+
+data = Listbox(main)
+data.place(x=280,y=20)
